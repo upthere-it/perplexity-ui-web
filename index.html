@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="style.css">
+    <title>App con Perplexity</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <style>
+      #particles-js {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="particles-js"></div>
+    <h1>ASK TO PERPLEXITY AI</h1>
+  
+    <div class="riga-input">
+        <label for="prompt">Sistema</label><br>
+        <input type="text" id="prompt" placeholder="Sono il dipendente di una azienda informatica, il mio ruolo è...."><br><br>
+    </div>
+
+    <div class="riga-input">
+        <label for="domanda">Utente</label><br>
+        <input type="text" id="domanda" placeholder="Come funziona il rapporto cliente - azienda? "><br><br>
+    </div>    
+
+    <div class="bottone-container"></div>
+        <button onclick="inviaRichiesta()">INVIO</button>
+    </div>
+
+    <div id="risposta"></div>
+  
+    <script>
+        async function inviaRichiesta() {
+            const contesto = document.getElementById("prompt").value;
+            const quesito = document.getElementById("domanda").value;
+
+        const body = {
+        model: "sonar",  
+        messages: [
+        {
+            role: "system",
+            content: contesto || "Rispondi in modo chiaro e conciso."
+        },
+        {
+            role: "user",
+            content: quesito
+        }
+        ]
+        };
+
+        try {
+            const response = await fetch("https://api.perplexity.ai/chat/completions", {
+                method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer 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" 
+            },
+            body: JSON.stringify(body)
+            });
+
+    const data = await response.json();
+
+    const risposta = data.choices?.[0]?.message?.content || "Nessuna risposta trovata.";
+    const tags = data.choices?.[0]?.message?.metadata?.tags || [];
+
+    document.getElementById("risposta").innerHTML = `
+      <p><strong>Risposta:</strong> ${risposta}</p>
+      <p><strong>Tag semantici:</strong> ${tags.length > 0 ? tags.join(", ") : "Nessun tag"}</p>
+    `;
+  } catch (error) {
+    console.error("Errore nella richiesta:", error);
+    document.getElementById("risposta").innerText = "Errore durante la richiesta.";
+  }
+}
+</script>
+
+<script>
+particlesJS("particles-js", {
+  particles: {
+    number: { value: 60 },
+    size: { value: 3 },
+    color: { value: "#64b3e0" },
+    line_linked: {
+      enable: true,
+      distance: 150,
+      color: "#64b3e0",
+      opacity: 0.4,
+      width: 1
+    },
+    move: {
+      enable: true,
+      speed: 2
+    }
+  }
+});
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,83 @@
+body {
+    font-family: Cambria, sans-serif;
+    background-color: #e3ebf9;
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+}
+
+.riga-input {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.riga-input label {
+    width: 100px;
+    font-weight: bold;
+}
+
+.riga-input input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.bottone-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #64b3e0;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    justify-content: flex-end;
+}
+
+button:hover{
+    background-color: #1d7cb3;
+}
+                                                                                                                        
+#risposta {
+    margin-top: 30px;
+    background-color: white;
+    padding: 15px;
+    border-radius: 6px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    min-height: 60px;
+}
+
+body {
+    position: relative;
+    overflow: hidden;
+}
+
+.animated-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(120deg, #64b3e0, #a0cbe8, #ffffff);
+    background-size: 300% 300%;
+    animation: sfondoAnimato 10s ease infinite;
+    z-index: -1;
+}
+
+@keyframes sfondoAnimato {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
