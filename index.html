@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+  
   <title>Ask a question</title>
-
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
   <style>
     #particles-js {
       position: fixed;
@@ -32,12 +36,12 @@
   <div class="contenitore">
       <div class="riga-input">
         <label for="prompt">Sistema</label>
-        <input type="text" id="prompt" placeholder="Sono il dipendente di una azienda informatica, il mio ruolo è....">
+        <input type="text" id="prompt" placeholder="Sono il dipendente di una azienda informatica, il mio ruolo è...." title="Inserisci il prompt">
       </div>
 
       <div class="riga-input">
         <label for="domanda">Utente</label>
-        <input type="text" id="domanda" placeholder="Come funziona il rapporto cliente - azienda?">
+        <input type="text" id="domanda" placeholder="Come funziona il rapporto cliente - azienda?" title="Inserisci la domanda">
       </div>    
 
       <div class="bottone-container">
@@ -48,26 +52,82 @@
   </div>
   
 <script>
+
+//attualmente le fonti vanno a metà, solo alcuni numeri sono collegati
+
+/*
+rispostaFormattataFonti estrae dal testo di Perplexity i riferimenti numerici delle fonti, 
+costruisce una mappa numero+link, successivamente elimina la lista delle fonti e 
+sostituisce ogni [numero] con un link cliccabile (URL)
+*/
+  function rispostaFormattataFonti(risposta, sources){
+    const fonteRegex = /\[(\d+)\]\s*(https?:\/\/[^\s]+)/g;   //intercetta il numero della fonte e cerca l'url
+    const mappaFonti = {};
+
+    let match;
+    while ((match = fonteRegex.exec(risposta)) !== null) {   //restituisce un array con la stringa, match e URL
+      mappaFonti[match[1]] = match[2];                       //scorre l'array e fa corrispondere il match all'url: [1]:https...
+    }
+
+    // Se non ci sono fonti nel testo, prova ad usare quelle fornite a parte
+    if (sources.length > 0 && Object.keys(mappaFonti).length === 0) {
+      sources.forEach((url, index) => {
+        const numero = index + 1;
+        mappaFonti[numero.toString()] = url;
+      });
+    }
+
+    let testoPrincipale = risposta.replace(fonteRegex, (match, numero) => `[${numero}]`);   //toglie dal testo il link https
+
+    testoPrincipale = testoPrincipale.replace(/\[(\d+)\]/g, (match, numero) => {
+      const url = mappaFonti[numero];
+      return url ? `<a href="${url}" target="_blank" rel="noopener noreferrer">[${numero}]</a>` : match;
+    });
+
+    let fontiHtml = "";
+    const voci = Object.entries(mappaFonti);
+    if (voci.length > 0) {
+      fontiHtml = "<strong>Fonti:</strong><ul>";
+      voci.forEach(([numero, url]) => {
+        fontiHtml += `<li>[${numero}] <a href="${url}" target="_blank">${url}</a></li>`;
+      });
+      fontiHtml += "</ul>";
+    }
+
+    return {
+      testo: testoPrincipale                                              //trova e sostituisce con spazi e grassetto
+        .replace(/\n/g, "<br>")
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"),
+      fonti: fontiHtml
+    };
+  }
+
+
   async function inviaRichiesta() {
-    const contesto = document.getElementById("prompt").value;
+    const contesto = document.getElementById("prompt").value;              //legge il testo inserito nei campi
     const quesito = document.getElementById("domanda").value;
 
-    const body = {
+    if (!quesito.trim()) {
+        alert("Per favore, inserisci una domanda.");
+        return;
+      }
+
+    const body = {                                                        //viene creato un oggetto(body) da inviare all'API di Perplexity che contiene modello, system e user
       model: "sonar",  
       messages: [
       {
-        role: "system",
-        content: contesto || "Rispondi in modo chiaro e conciso."
+        role: "system",                                                     //(istruisce il modello su come scrivere)
+        content: contesto || "Rispondi alla domanda con una spiegazione chiara, oggettiva e aggiungi le fonti con formato [1] https://..., [2] https://..., ecc."
       },
       {
-        role: "user",
+        role: "user",                                                        //(domanda dell'utente)
         content: quesito
       }
       ]
     };
 
     try {
-      const response = await fetch("https://api.perplexity.ai/chat/completions", {
+      const response = await fetch("https://api.perplexity.ai/chat/completions", {                 //richiesta a perplexity
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -76,11 +136,11 @@
         body: JSON.stringify(body)
       });
 
-      const data = await response.json();
-
+      const data = await response.json();                                                          //aspetta la risposta e la converte
       const risposta = data.choices?.[0]?.message?.content || "Nessuna risposta trovata.";
+      const sources = data.choices?.[0]?.message?.sources || data.choices?.[0]?.sources || [];  
 
-      const paroleComuni = ['questo','quello','dunque','comunque','perché','dalla','delle','nella','negli','alla'];
+      const paroleComuni = ['questo','quello','dunque','comunque','perché','dalla','delle','nella','negli','alla'];             //personalizzazione parole chiavi
       const paroleChiave = [...new Set(
         risposta
           .toLowerCase()
@@ -88,32 +148,31 @@
           .split(/\s+/)
           .filter(p => p.length > 5 && !paroleComuni.includes(p))
       )].slice(0, 5);
+                                         
+      const { testo, fonti } = rispostaFormattataFonti(risposta, sources);
 
-
-      const rispostaFormattata = risposta
-        .replace(/\n/g, "<br>")
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-
-
-      document.getElementById("risposta").innerHTML = `
-      <section class="output">
-          <p><strong>Risposta:</strong><br>${rispostaFormattata}</p>
+      document.getElementById("risposta").innerHTML = `                       
+      <section class="output">                                  
+          <p><strong>Risposta:</strong><br>${testo}</p>
         <div class="tags-container">
           <strong>Tag semantici:</strong><br>
           ${
-            paroleChiave.length > 0
+            paroleChiave.length > 0                                                                    //scrive il contenuto della sezione con tag e la risposta
             ? paroleChiave.map(tag => `<span class="tag">${tag}</span>`).join(" ")
             : "<em>Nessun tag</em>"
           }
         </div>
+        <div class="fonti">
+          ${fonti || "<strong>Fonti:</strong><br><em>Nessuna fonte trovata</em>"}
+        </div>
       </section>
   `;
-
-    } catch (error) {
+    } catch (error) {                                                                                     //gestione degli errori
       console.error("Errore nella richiesta:", error);
       document.getElementById("risposta").innerText = "Errore durante la richiesta.";
     }
   }
+
 </script>
 
 <script>
@@ -136,6 +195,7 @@ particlesJS("particles-js", {
   }
 });
 </script>
+
 
 </body>
 </html>

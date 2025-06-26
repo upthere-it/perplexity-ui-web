@@ -1,3 +1,4 @@
+
 body {
     position: relative;
     overflow: hidden;
@@ -10,7 +11,10 @@ body {
 h1 {
     color: #333;
     text-align: center;
-    margin-bottom: 40px;
+    margin-top: 0;
+    margin-bottom: .5rem;
+    line-height: 1.2;
+    padding-bottom: 30px;
 }
 
 input {
@@ -27,20 +31,19 @@ input {
 
 .riga-input {
     display: flex;
-    align-items: center; 
-    margin-bottom: 20px;
-    justify-content: center;
-    gap: 20px;
+    flex-direction: column;
+    align-items: flex-start;
     width: 100%;
-    max-width: 900px;
+    max-width: 600px;
+    margin-bottom: 20px;
 }
 
 .riga-input label {
     font-weight: bold;
-    width: 120px;
-    text-align: right;
     font-size: 16px;
+    margin-bottom: 8px;
 }
+
 
 .riga-input input {
     flex: 1;
@@ -57,15 +60,14 @@ input {
     background-color: #fdfdfd;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
-
 .bottone-container {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     width: 100%;
     max-width: 900px;
-    margin-top: -90px;
-    padding-left: 290px;
+    margin-top: 0;
 }
+
 
 button {
     padding: 12px 30px;
@@ -85,11 +87,12 @@ button:hover{
                                                                                                                         
 #risposta {
     margin-top: 40px;
+    margin-bottom: 20px;
     background-color: white;
     padding: 10px 30px;
     border-radius: 8px;
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    height: 280px;
+    height: 130px;
     min-height: 100px;
     width: 100%;
     max-width: 1000px;
@@ -129,5 +132,6 @@ button:hover{
   background-color: #1d7cb3;
   cursor: default;
 }
+
 
 
