@@ -3,10 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="style.css">
+  <title>Interfaccia AI</title>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-  
-  <title>Ask a question</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
   <style>
@@ -26,35 +28,53 @@
       transition: background-color 5000s ease-in-out 0s;
     }
 
+    #risposta.collapse {
+      transition: max-height 0.8s ease; 
+    }
   </style>
 </head>
 
 <body>
+
   <div id="particles-js"></div>
-  <h1>ASK TO PERPLEXITY AI</h1>
+  <h1>CONSOLE Q&A PERPLEXITY</h1>
   
   <div class="contenitore">
-      <div class="riga-input">
-        <label for="prompt">Sistema</label>
-        <input type="text" id="prompt" placeholder="Sono il dipendente di una azienda informatica, il mio ruolo è...." title="Inserisci il prompt">
-      </div>
+    <div class="riga-input mb-3">
+      <label for="prompt">Sistema</label>
+      <input type="text" class="form-control" id="prompt" placeholder="Sono il dipendente di una azienda informatica, il mio ruolo è...." title="Inserisci il prompt">
+    </div>
 
-      <div class="riga-input">
-        <label for="domanda">Utente</label>
-        <input type="text" id="domanda" placeholder="Come funziona il rapporto cliente - azienda?" title="Inserisci la domanda">
-      </div>    
+    <div class="riga-input">
+      <div class="row g-2 align-items-end mb-3">
+        <div class="col-md-9">
+          <label for="domanda" class="form-label">Utente</label>
+          <input type="text" class="form-control" id="domanda" placeholder="Come funziona il rapporto cliente - azienda?" title="Inserisci la domanda">
+        </div>
 
-      <div class="bottone-container">
-        <button onclick="inviaRichiesta()">INVIO</button>
-      </div>
+        <div class="col-md-3">
+          <div class="upload-wrapper">
+            <input type="file" id="fileInput" accept=".txt,.md,.csv,.json" title="Allega un file (opzionale)">           <!--allegamento file-->
+            <label for="fileInput" class="upload-label" title="Allega un file">
+              <i class="bi bi-paperclip"></i>
+            </label>
+            <span id="fileName" class="file-name"></span>
+          </div>
+        </div>
+      </div> 
+    </div>
+
+    <div class="bottone-container">
+      <button id="bottoneInvio" onclick="inviaRichiesta()" class="btn btn-primary">
+        <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+        <span id="testo-Bottone">INVIO</span>
+      </button>
+    </div>
     
-      <div id="risposta"></div>
+    <div id="risposta" class="collapse"></div>
   </div>
   
 <script>
-
-//attualmente le fonti vanno a metà, solo alcuni numeri sono collegati
-
 /*
 rispostaFormattataFonti estrae dal testo di Perplexity i riferimenti numerici delle fonti, 
 costruisce una mappa numero+link, successivamente elimina la lista delle fonti e 
@@ -77,17 +97,17 @@ sostituisce ogni [numero] con un link cliccabile (URL)
       });
     }
 
-    let testoPrincipale = risposta.replace(fonteRegex, (match, numero) => `[${numero}]`);   //toglie dal testo il link https
+    let testoPrincipale = risposta.replace(fonteRegex, (match, numero) => `[${numero}]`);                  //toglie dal testo il link https
 
-    testoPrincipale = testoPrincipale.replace(/\[(\d+)\]/g, (match, numero) => {
-      const url = mappaFonti[numero];
-      return url ? `<a href="${url}" target="_blank" rel="noopener noreferrer">[${numero}]</a>` : match;
+    testoPrincipale = testoPrincipale.replace(/\[(\d+)\]/g, (match, numero) => {                           //sostituisce i riferimenti alle fonti con dei link cliccabili, trova i [n]
+      const url = mappaFonti[numero];                                                                      //estrai il numero e prende l'url dalla mappaFonti
+      return url ? `<a href="${url}" target="_blank" rel="noopener noreferrer">[${numero}]</a>` : match;   //se è presente l'url, lo trasfoma in un link cliccabile
     });
 
-    let fontiHtml = "";
-    const voci = Object.entries(mappaFonti);
-    if (voci.length > 0) {
-      fontiHtml = "<strong>Fonti:</strong><ul>";
+    let fontiHtml = "";                                                                 //creazione lista delle fonti
+    const voci = Object.entries(mappaFonti);                                            //crea in array (numero, url)
+    if (voci.length > 0) {                                                              //se ci sono fonti, crea l'elenco
+      fontiHtml = "<strong>Fonti:</strong><ul>";                                        //per ogni link (voci), crea la corrispondenza nell'elenco
       voci.forEach(([numero, url]) => {
         fontiHtml += `<li>[${numero}] <a href="${url}" target="_blank">${url}</a></li>`;
       });
@@ -95,7 +115,7 @@ sostituisce ogni [numero] con un link cliccabile (URL)
     }
 
     return {
-      testo: testoPrincipale                                              //trova e sostituisce con spazi e grassetto
+      testo: testoPrincipale                                              //trova e sostituisce con spazi e grassetto 
         .replace(/\n/g, "<br>")
         .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"),
       fonti: fontiHtml
@@ -104,24 +124,59 @@ sostituisce ogni [numero] con un link cliccabile (URL)
 
 
   async function inviaRichiesta() {
-    const contesto = document.getElementById("prompt").value;              //legge il testo inserito nei campi
-    const quesito = document.getElementById("domanda").value;
+    const bottone = document.getElementById("bottoneInvio");
+    const spinner = document.getElementById("spinner");
+    const testoBottone = document.getElementById("testo-Bottone");
 
-    if (!quesito.trim()) {
-        alert("Per favore, inserisci una domanda.");
+
+    let contesto = document.getElementById("prompt").value.trim();              //legge il testo inserito nei campi
+
+    const fraseFonti = "Rispondi alla domanda con una spiegazione chiara, oggettiva e aggiungi le fonti con formato [1] https://..., [2] https://..., ecc."
+                                                                                                 
+    if(!contesto.toLowerCase().includes("aggiungi le fonti") && !contesto.toLowerCase().includes("format [1]")) {
+      contesto = contesto                                            //se l'utente non inserisce "aggiungi i link", lo fa il programma
+        ? contesto + " " + fraseFonti
+        : fraseFonti;
+    }
+
+    const quesito = document.getElementById("domanda").value;
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
+
+    let contenutoFile = "";
+    if (file) {
+      try {
+        contenutoFile = await file.text();                                             // legge il file come testo semplice
+      } catch (e) {
+        console.error("Errore nella lettura del file:", e);
+        alert("Errore nel caricamento del file. Assicurati che sia un file di testo.");
         return;
       }
+    }
+
+    if (!quesito.trim()) {
+        alert("Nessun campo compilato");
+        return;
+      }
+
+    spinner.classList.remove("d-none");
+    testoBottone.textContent = "caricamento...";
+    bottone.disabled = true;
+
+    const contenutoDomanda = file
+      ? `${quesito}\n\n[TESTO ALLEGATO DA LEGGERE E CONSIDERARE]:\n${contenutoFile}`
+      : quesito;
 
     const body = {                                                        //viene creato un oggetto(body) da inviare all'API di Perplexity che contiene modello, system e user
       model: "sonar",  
       messages: [
       {
-        role: "system",                                                     //(istruisce il modello su come scrivere)
+        role: "system",                                                   //(istruisce il modello su come scrivere)
         content: contesto || "Rispondi alla domanda con una spiegazione chiara, oggettiva e aggiungi le fonti con formato [1] https://..., [2] https://..., ecc."
       },
       {
-        role: "user",                                                        //(domanda dell'utente)
-        content: quesito
+        role: "user",                                                     //(domanda dell'utente)
+        content: contenutoDomanda
       }
       ]
     };
@@ -140,7 +195,7 @@ sostituisce ogni [numero] con un link cliccabile (URL)
       const risposta = data.choices?.[0]?.message?.content || "Nessuna risposta trovata.";
       const sources = data.choices?.[0]?.message?.sources || data.choices?.[0]?.sources || [];  
 
-      const paroleComuni = ['questo','quello','dunque','comunque','perché','dalla','delle','nella','negli','alla'];             //personalizzazione parole chiavi
+      const paroleComuni = ['questo','quello','dunque','comunque','perché','dalla','delle','nella','negli','alla'];         //personalizzazione parole chiavi
       const paroleChiave = [...new Set(
         risposta
           .toLowerCase()
@@ -151,26 +206,40 @@ sostituisce ogni [numero] con un link cliccabile (URL)
                                          
       const { testo, fonti } = rispostaFormattataFonti(risposta, sources);
 
-      document.getElementById("risposta").innerHTML = `                       
+      const rispostaDiv = document.getElementById("risposta");
+
+      document.getElementById("risposta").innerHTML = `
       <section class="output">                                  
           <p><strong>Risposta:</strong><br>${testo}</p>
-        <div class="tags-container">
-          <strong>Tag semantici:</strong><br>
-          ${
-            paroleChiave.length > 0                                                                    //scrive il contenuto della sezione con tag e la risposta
-            ? paroleChiave.map(tag => `<span class="tag">${tag}</span>`).join(" ")
-            : "<em>Nessun tag</em>"
-          }
-        </div>
-        <div class="fonti">
-          ${fonti || "<strong>Fonti:</strong><br><em>Nessuna fonte trovata</em>"}
+          <div class="tags-container">
+            <strong>Tag semantici:</strong><br>
+            ${
+              paroleChiave.length > 0                                                                    //scrive il contenuto della sezione con tag e la risposta
+              ? paroleChiave.map(tag => `<span class="tag">${tag}</span>`).join(" ")
+              : "<em>Nessun tag</em>"
+            }
+          </div>
+          <div class="fonti">
+            ${fonti || "<strong>Fonti:</strong><br><em>Nessuna fonte trovata</em>"}
         </div>
       </section>
   `;
+
+  if (!rispostaDiv.classList.contains("show")) {
+    const collapse = new bootstrap.Collapse(rispostaDiv);
+    collapse.show(); 
+  }
+  rispostaDiv.scrollIntoView({ behavior: "smooth" });
+
     } catch (error) {                                                                                     //gestione degli errori
       console.error("Errore nella richiesta:", error);
       document.getElementById("risposta").innerText = "Errore durante la richiesta.";
+    } finally {
+      spinner.classList.add("d-none");
+      testoBottone.textContent ="INVIO";
+      bottone.disabled = false;
     }
+
   }
 
 </script>
@@ -196,7 +265,7 @@ particlesJS("particles-js", {
 });
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
-
