@@ -2,7 +2,7 @@
 body {
     position: relative;
     overflow: hidden;
-    font-family: Cambria, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #e3ebf9;
     padding: 40px 20px;
     margin: auto;
@@ -60,6 +60,32 @@ input {
     background-color: #fdfdfd;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
+
+.upload-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.upload-wrapper input[type="file"] {
+  display: none;
+}
+
+.upload-label {
+  cursor: pointer;
+  font-size: 30px; 
+  padding: 8px;
+  margin-right: 770px;
+  border: 1px solid #ccc;
+  background-color: #fdfdfd;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .bottone-container {
     display: flex;
     justify-content: center;
@@ -69,21 +95,21 @@ input {
 }
 
 
-button {
+button#bottoneInvio {
     padding: 12px 30px;
     background-color: #64b3e0;
     color: white;
-    border: none;
-    border-radius: 6px;
+    border: 2px solid #1d7cb3;
+    border-radius: 40px;
     cursor: pointer;
     font-size: 16px;
-    justify-content: flex-end;
     transition: background-color 0.3s;
 } 
 
-button:hover{
+button#bottoneInvio:hover{
     background-color: #1d7cb3;
 }
+
                                                                                                                         
 #risposta {
     margin-top: 40px;
