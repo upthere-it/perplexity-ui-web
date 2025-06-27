@@ -9,18 +9,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-
+ 
   <style>
-    #particles-js {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-    }
-
     input:-webkit-autofill {
       background-color: white !important;
       -webkit-box-shadow: 0 0 0px 1000px white inset !important;
@@ -36,7 +26,6 @@
 
 <body>
 
-  <div id="particles-js"></div>
   <h1>CONSOLE Q&A PERPLEXITY</h1>
   
   <div class="contenitore">
@@ -54,7 +43,7 @@
 
         <div class="col-md-3">
           <div class="upload-wrapper">
-            <input type="file" id="fileInput" accept=".txt,.md,.csv,.json" title="Allega un file (opzionale)">           <!--allegamento file-->
+            <input type="file" id="fileInput" accept=".txt,.md,.csv,.json" title="Allega un file (opzionale)" multiple hidden>           <!--allegamento file-->
             <label for="fileInput" class="upload-label" title="Allega un file">
               <i class="bi bi-paperclip"></i>
             </label>
@@ -72,6 +61,7 @@
     </div>
     
     <div id="risposta" class="collapse"></div>
+
   </div>
   
 <script>
@@ -128,11 +118,9 @@ sostituisce ogni [numero] con un link cliccabile (URL)
     const spinner = document.getElementById("spinner");
     const testoBottone = document.getElementById("testo-Bottone");
 
-
     let contesto = document.getElementById("prompt").value.trim();              //legge il testo inserito nei campi
 
-    const fraseFonti = "Rispondi alla domanda con una spiegazione chiara, oggettiva e aggiungi le fonti con formato [1] https://..., [2] https://..., ecc."
-                                                                                                 
+    const fraseFonti = "Rispondi alla domanda con una spiegazione chiara, oggettiva e aggiungi le fonti con formato [1] https://..., [2] https://..., ecc., ma non fare un elenco delle fonti alla fine"                                                                                              
     if(!contesto.toLowerCase().includes("aggiungi le fonti") && !contesto.toLowerCase().includes("format [1]")) {
       contesto = contesto                                            //se l'utente non inserisce "aggiungi i link", lo fa il programma
         ? contesto + " " + fraseFonti
@@ -172,7 +160,7 @@ sostituisce ogni [numero] con un link cliccabile (URL)
       messages: [
       {
         role: "system",                                                   //(istruisce il modello su come scrivere)
-        content: contesto || "Rispondi alla domanda con una spiegazione chiara, oggettiva e aggiungi le fonti con formato [1] https://..., [2] https://..., ecc."
+        content: contesto || "Rispondi alla domanda con una spiegazione chiara, oggettiva e aggiungi le fonti con formato [1] https://..., [2] https://..., ecc., ma non fare un elenco delle fonti alla fine. Riconosci dal testo anche dai 3 ai 5 tag semantici."
       },
       {
         role: "user",                                                     //(domanda dell'utente)
@@ -180,7 +168,7 @@ sostituisce ogni [numero] con un link cliccabile (URL)
       }
       ]
     };
-
+          //^ deve essere aggiunta la visualizzazione dei tag con i json, possibile ma va scombinato il codice. (metodo di richiesta di una nuova domanda e poi estrazione del json per riportare i tag)
     try {
       const response = await fetch("https://api.perplexity.ai/chat/completions", {                 //richiesta a perplexity
         method: "POST",
@@ -194,8 +182,9 @@ sostituisce ogni [numero] con un link cliccabile (URL)
       const data = await response.json();                                                          //aspetta la risposta e la converte
       const risposta = data.choices?.[0]?.message?.content || "Nessuna risposta trovata.";
       const sources = data.choices?.[0]?.message?.sources || data.choices?.[0]?.sources || [];  
-
-      const paroleComuni = ['questo','quello','dunque','comunque','perché','dalla','delle','nella','negli','alla'];         //personalizzazione parole chiavi
+      
+//poi questo andrà via se lo faccio bene con la richiesta all'ai .|
+      const paroleComuni = ['questo','quello','dunque','comunque','perché','dalla','delle','nella','negli','alla'];         //personalizzazione tag
       const paroleChiave = [...new Set(
         risposta
           .toLowerCase()
@@ -209,8 +198,11 @@ sostituisce ogni [numero] con un link cliccabile (URL)
       const rispostaDiv = document.getElementById("risposta");
 
       document.getElementById("risposta").innerHTML = `
-      <section class="output">                                  
+      <div class="risposta-wrapper"> 
+        <div class="risposta-sinistra"> 
           <p><strong>Risposta:</strong><br>${testo}</p>
+        </div>
+        <div class="risposta-destra"> 
           <div class="tags-container">
             <strong>Tag semantici:</strong><br>
             ${
@@ -221,8 +213,10 @@ sostituisce ogni [numero] con un link cliccabile (URL)
           </div>
           <div class="fonti">
             ${fonti || "<strong>Fonti:</strong><br><em>Nessuna fonte trovata</em>"}
+          </div>
         </div>
-      </section>
+      </div>
+      
   `;
 
   if (!rispostaDiv.classList.contains("show")) {
@@ -244,28 +238,46 @@ sostituisce ogni [numero] con un link cliccabile (URL)
 
 </script>
 
-<script>
-particlesJS("particles-js", {
-  particles: {
-    number: { value: 60 },
-    size: { value: 3 },
-    color: { value: "#64b3e0" },
-    line_linked: {
-      enable: true,
-      distance: 170,
-      color: "#64b3e0",
-      opacity: 0.4,
-      width: 1
-    },
-    move: {
-      enable: true,
-      speed: 1
-    }
-  }
-});
-</script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div class="toast" id="fileToast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <i class="bi bi-paperclip me-2"></i>
+        <strong class="me-auto">File allegato</strong>                                                          <!--notifica quando viene inserito un allegato-->
+        <small class="text-muted">Adesso</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Chiudi"></button>
+      </div>
+      <div class="toastBody">
+          Hai allegato: <span id="nomeFileToast"></span>
+        <ul id="listaFileToast" class="mb-0"></ul>
+      </div>
+   </div>
+  </div>
+
+  <script>
+    let cliccatoSuAllegato = false
+    document.querySelector(".upload-label").addEventListener("click", () => {                            //quando si clicca sull'allegato e si inserisce, compare il toast con la lista di essi
+      cliccatoSuAllegato = true;
+    });
+
+    document.getElementById("fileInput").addEventListener("change", function(){
+      if(cliccatoSuAllegato && this.files.length > 0){
+        const listaFileToast = document.getElementById("listaFileToast");
+        listaFileToast.innerHTML ="";
+
+        Array.from(this.files).forEach(file => {
+          const li = document.createElement("li");
+          li.textContent = file.name;
+          listaFileToast.appendChild(li);
+        });
+
+        const toast = new bootstrap.Toast(document.getElementById("fileToast"));
+        toast.show();
+        cliccatoSuAllegato = false;
+      }
+    });
+  </script>
 
 </body>
 </html>

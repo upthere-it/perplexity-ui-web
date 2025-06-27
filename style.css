@@ -1,20 +1,21 @@
 
 body {
-    position: relative;
-    overflow: hidden;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #e3ebf9;
-    padding: 40px 20px;
-    margin: auto;
+  position: relative;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: radial-gradient(circle,rgba(225, 128, 255, 0.626) 0%, rgb(185, 96, 244) 100%);
+  background-size: 200% 200%;
+  padding: 2.5vw 2vw;
+  margin: auto;
 }
 
 h1 {
-    color: #333;
-    text-align: center;
-    margin-top: 0;
-    margin-bottom: .5rem;
-    line-height: 1.2;
-    padding-bottom: 30px;
+  color: #ffffff;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 2rem;
+  line-height: 1.2;
+  padding-bottom: 2vw;
+  font-size: 3vw;
 }
 
 input {
@@ -23,42 +24,44 @@ input {
 }
 
 .contenitore {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2vw;
 }
 
 .riga-input {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-    max-width: 600px;
-    margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 60vw;
+  margin-bottom: 2vw;
+  box-sizing: border-box;
 }
 
 .riga-input label {
-    font-weight: bold;
-    font-size: 16px;
-    margin-bottom: 8px;
+  display: inline;
+  color: #000;
+  font-weight: bold;
+  font-size: 1v;
+  margin-bottom: 0.5vw;
 }
 
-
 .riga-input input {
-    flex: 1;
-    padding: 14px;
-    height: auto;
-    line-height: normal;
-    vertical-align: middle;
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 16px;
-    width: 100%;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #fdfdfd;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  flex: 1;
+  padding: 1vw;
+  height: auto;
+  line-height: normal;
+  vertical-align: middle;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 0.6vw;
+  font-size: 1vw;
+  width: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fdfdfd;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .upload-wrapper {
@@ -74,12 +77,12 @@ input {
 
 .upload-label {
   cursor: pointer;
-  font-size: 30px; 
-  padding: 8px;
-  margin-right: 770px;
+  font-size: 1.5vw; 
+  padding: 0.5vw;
+  margin-right: 77vw;
   border: 1px solid #ccc;
   background-color: #fdfdfd;
-  border-radius: 6px;
+  border-radius: 0.6vw;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   display: flex;
   align-items: center;
@@ -87,77 +90,115 @@ input {
 }
 
 .bottone-container {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    max-width: 900px;
-    margin-top: 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 90vw;
+  margin-top: 0;
 }
 
 
 button#bottoneInvio {
-    padding: 12px 30px;
-    background-color: #64b3e0;
-    color: white;
-    border: 2px solid #1d7cb3;
-    border-radius: 40px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
+  padding: 12px 30px;
+  background-color: #000000;
+  color: white;
+  border: white;
+  border-radius: 40px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
 } 
 
 button#bottoneInvio:hover{
-    background-color: #1d7cb3;
+  background-color: #393b3d;
 }
 
-                                                                                                                        
-#risposta {
-    margin-top: 40px;
-    margin-bottom: 20px;
-    background-color: white;
-    padding: 10px 30px;
-    border-radius: 8px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    height: 130px;
-    min-height: 100px;
-    width: 100%;
-    max-width: 1000px;
-    font-size: 16px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    text-align: justify;
-    overflow-y: auto;
-    overflow-wrap: break-word;
-    box-sizing: border-box;
+
+.risposta-wrapper {
+  display: flex;
+  gap: 2vw;
+  margin-top: 2vw;
+  align-items: flex-start;
+  justify-content: space-between;
+  font-size: 1vw;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: justify;
+  overflow-wrap: break-word;
+  width: 100%;
+  max-width: 90vw;
+  padding: 2vw;
+  background-color: #fff;
+  border-radius: 1vw;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
 }
 
+.risposta-sinistra {
+  flex: 2;
+  min-width: 0;
+}
+
+.risposta-destra {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1vw;
+}
 
 .output {
-  font-size: 16px;
+  font-size: 1vw;
   line-height: 1.6;
 }
 
 .tags-container {
-  margin-top: 15px;
-  margin-bottom: 15px;
+  margin-top: 1vw;
+  margin-bottom: 1vw;
 }
 
+.tags-container .tag, 
 .tag {
   display: inline-block;
-  background-color: #64b3e0;
-  color: white;
-  padding: 5px 15px;
-  border-radius: 16px;
-  font-size: 14px;
+  background-color: #eb8dac;
+  color: #432045;
+  padding: 0.5vw 1.5vw;
+  border-radius: 1vw;
+  font-size: 0.9vw;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 4px 4px 0 0;
+  margin: 0.5vw 0.5vw 0 0;
   white-space: nowrap;
   transition: background-color 0.3s;
 }
 
 .tag:hover {
-  background-color: #1d7cb3;
+  background-color: #df7ab9;
   cursor: default;
 }
+
+.fonti ul {
+  padding-left: 1.5vw;
+  margin-top: 1vw;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 4vw;
+  }
+  .riga-input label,
+  .riga-input input,
+  button#bottoneInvio,
+  .output,
+  .tag {
+    font-size: 3vw;
+  }
+  .upload-label {
+    font-size: 4vw;
+    margin-right: 5vw;
+  }
+  .risposta-wrapper {
+    flex-direction: column;
+  }
+}
+
+
 
 
 
